@@ -17,7 +17,7 @@ namespace AIAgentExtension
         public const string PackageGuidString = "12345678-1234-1234-1234-123456789012";
         public static readonly Guid CommandSetGuid = new Guid("87654321-4321-4321-4321-210987654321");
 
-        public const int ToolWindowCommandId = 0x0100;
+        public const int ShowToolWindowCommandId = 0x0100;
         public const int AnalyzeCodeCommandId = 0x0101;
         public const int RefactorCommandId = 0x0102;
         public const int GenerateTestsCommandId = 0x0103;
@@ -65,6 +65,6 @@ namespace AIAgentExtension
         [Category("Middleware")]
         [DisplayName("Agent API URL")]
         [Description("URL de votre middleware agent")]
-        public string AgentApiUrl { get; set; } = "http://localhost:5000";
+        public string AgentApiUrl { get; set; } = "http://localhost:5210"; // Corrigé le port
     }
 }

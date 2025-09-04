@@ -82,12 +82,8 @@ namespace AIAgentExtension
                 var dte = await ServiceProvider.GetGlobalServiceAsync(typeof(DTE)) as DTE;
                 if (dte?.ActiveDocument?.Selection is TextSelection selection && !string.IsNullOrEmpty(selection.Text))
                 {
-                    // Ouvrir la fenêtre de chat avec un message pré-rempli
                     var package = this.package as AIAgentPackage;
                     await package?.ShowToolWindowAsync();
-
-                    // TODO: Envoyer automatiquement le code sélectionné pour analyse
-                    // Cela nécessiterait une référence à AIAgentControl ou un système d'événements
                 }
                 else
                 {
@@ -116,6 +112,12 @@ namespace AIAgentExtension
     }
 
     // Commande pour refactoriser
+    /// <summary>
+    /// Represents a command that triggers a refactoring operation within the Visual Studio environment.
+    /// </summary>
+    /// <remarks>This command is registered with a specific command ID and GUID, and it integrates with the
+    /// Visual Studio command system. It is designed to display a tool window when executed. The command is initialized
+    /// asynchronously and must be accessed through the <see cref="Instance"/> property after initialization.</remarks>
     internal sealed class RefactorCommand
     {
         public const int CommandId = 0x0102;
@@ -148,8 +150,6 @@ namespace AIAgentExtension
 
             var package = this.package as AIAgentPackage;
             await package?.ShowToolWindowAsync();
-
-            // TODO: Pré-remplir avec "Refactore ce code :"
         }
     }
 
@@ -186,8 +186,6 @@ namespace AIAgentExtension
 
             var package = this.package as AIAgentPackage;
             await package?.ShowToolWindowAsync();
-
-            // TODO: Pré-remplir avec "Génère des tests unitaires pour :"
         }
     }
 }

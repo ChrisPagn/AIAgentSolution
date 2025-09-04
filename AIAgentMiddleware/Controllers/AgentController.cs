@@ -37,7 +37,9 @@ public class AgentController : ControllerBase
             return StatusCode(500, new AgentResponse
             {
                 ResponseText = $"Erreur interne: {ex.Message}",
-                ModifiedFiles = new List<FileModification>()
+                ModifiedFiles = new List<FileModification>(),
+                Success = false,
+                ErrorMessage = ex.Message
             });
         }
     }
@@ -54,7 +56,8 @@ public class AgentController : ControllerBase
                 Message = $"Analyse ce code et donne-moi des suggestions d'amélioration:\n\n```csharp\n{request.Code}\n```",
                 ProjectContext = request.ProjectContext,
                 Instruction = "analyze-code",
-                FilePath = request.FilePath
+                FilePath = request.FilePath,
+                SelectedCode = request.Code
             };
 
             var response = await _orchestrator.ProcessRequestAsync(agentRequest);
@@ -66,7 +69,9 @@ public class AgentController : ControllerBase
             return StatusCode(500, new AgentResponse
             {
                 ResponseText = $"Erreur lors de l'analyse: {ex.Message}",
-                ModifiedFiles = new List<FileModification>()
+                ModifiedFiles = new List<FileModification>(),
+                Success = false,
+                ErrorMessage = ex.Message
             });
         }
     }
@@ -83,7 +88,8 @@ public class AgentController : ControllerBase
                 Message = $"Refactorise ce code ({request.RefactorType}):\n\n```csharp\n{request.Code}\n```\n\nInstructions spécifiques: {request.Instructions}",
                 ProjectContext = request.ProjectContext,
                 Instruction = "refactor",
-                FilePath = request.FilePath
+                FilePath = request.FilePath,
+                SelectedCode = request.Code
             };
 
             var response = await _orchestrator.ProcessRequestAsync(agentRequest);
@@ -95,7 +101,9 @@ public class AgentController : ControllerBase
             return StatusCode(500, new AgentResponse
             {
                 ResponseText = $"Erreur lors du refactoring: {ex.Message}",
-                ModifiedFiles = new List<FileModification>()
+                ModifiedFiles = new List<FileModification>(),
+                Success = false,
+                ErrorMessage = ex.Message
             });
         }
     }
@@ -112,7 +120,8 @@ public class AgentController : ControllerBase
                 Message = $"Génère des tests unitaires complets pour cette classe:\n\n```csharp\n{request.Code}\n```\n\nFramework de test: {request.TestFramework}",
                 ProjectContext = request.ProjectContext,
                 Instruction = "generate-tests",
-                FilePath = request.FilePath
+                FilePath = request.FilePath,
+                SelectedCode = request.Code
             };
 
             var response = await _orchestrator.ProcessRequestAsync(agentRequest);
@@ -124,7 +133,9 @@ public class AgentController : ControllerBase
             return StatusCode(500, new AgentResponse
             {
                 ResponseText = $"Erreur lors de la génération des tests: {ex.Message}",
-                ModifiedFiles = new List<FileModification>()
+                ModifiedFiles = new List<FileModification>(),
+                Success = false,
+                ErrorMessage = ex.Message
             });
         }
     }
@@ -132,5 +143,27 @@ public class AgentController : ControllerBase
     [HttpGet("health")]
     public IActionResult Health()
     {
-        return Ok(new { Status = "Healthy", Timestamp = DateTime.UtcNow });
+        return Ok(new
+        {
+            Status = "Healthy",
+            Timestamp = DateTime.UtcNow,
+            Version = "1.0.0",
+            Environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT")
+        });
     }
+
+    [HttpGet("test-config")]
+    public IActionResult TestConfiguration([FromServices] IConfiguration configuration)
+    {
+        var claudeKey = configuration["ApiKeys:Claude"];
+        var openAiKey = configuration["ApiKeys:OpenAI"];
+
+        return Ok(new
+        {
+            ClaudeConfigured = !string.IsNullOrEmpty(claudeKey),
+            OpenAIConfigured = !string.IsNullOrEmpty(openAiKey),
+            ClaudeKeyPrefix = claudeKey?.Substring(0, Math.Min(15, claudeKey.Length)) + "...",
+            OpenAIKeyPrefix = openAiKey?.Substring(0, Math.Min(10, openAiKey.Length)) + "..."
+        });
+    }
+}
