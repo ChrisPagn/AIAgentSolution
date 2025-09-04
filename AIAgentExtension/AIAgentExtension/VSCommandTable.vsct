@@ -1,0 +1,124 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CommandTable xmlns="http://schemas.microsoft.com/VisualStudio/2005-10-18/CommandTable" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  
+  <Extern href="stdidcmd.h"/>
+  <Extern href="vsshlids.h"/>
+
+  <Commands package="guidAIAgentPackage">
+    <Groups>
+      <!-- Groupe pour les commandes AI Agent -->
+      <Group guid="guidAIAgentPackageCmdSet" id="AIAgentMenuGroup" priority="0x0600">
+        <Parent guid="guidSHLMainMenu" id="IDM_VS_CTXT_CODEWIN"/>
+      </Group>
+      
+      <!-- Groupe pour le menu Tools -->
+      <Group guid="guidAIAgentPackageCmdSet" id="AIAgentToolsGroup" priority="0x0600">
+        <Parent guid="guidSHLMainMenu" id="IDM_VS_MENU_TOOLS"/>
+      </Group>
+
+      <!-- Groupe pour Solution Explorer -->
+      <Group guid="guidAIAgentPackageCmdSet" id="AIAgentSolutionGroup" priority="0x0600">
+        <Parent guid="guidSHLMainMenu" id="IDM_VS_CTXT_ITEMNODE"/>
+      </Group>
+    </Groups>
+
+    <Buttons>
+      <!-- Bouton pour ouvrir la fenêtre de chat -->
+      <Button guid="guidAIAgentPackageCmdSet" id="ShowToolWindowCommandId" priority="0x0100" type="Button">
+        <Parent guid="guidAIAgentPackageCmdSet" id="AIAgentToolsGroup" />
+        <Icon guid="guidImages" id="bmpPic1" />
+        <Strings>
+          <ButtonText>Ouvrir AI Agent Chat</ButtonText>
+          <MenuText>AI Agent Chat</MenuText>
+          <ToolTipText>Ouvre la fenêtre de chat avec l'agent IA</ToolTipText>
+        </Strings>
+      </Button>
+
+      <!-- Commande pour analyser le code sélectionné -->
+      <Button guid="guidAIAgentPackageCmdSet" id="AnalyzeCodeCommandId" priority="0x0101" type="Button">
+        <Parent guid="guidAIAgentPackageCmdSet" id="AIAgentMenuGroup" />
+        <Icon guid="guidImages" id="bmpPic2" />
+        <Strings>
+          <ButtonText>Analyser avec IA</ButtonText>
+          <MenuText>🔍 Analyser avec IA</MenuText>
+          <ToolTipText>Analyse le code sélectionné avec l'IA</ToolTipText>
+        </Strings>
+      </Button>
+
+      <!-- Commande pour refactoriser -->
+      <Button guid="guidAIAgentPackageCmdSet" id="RefactorCommandId" priority="0x0102" type="Button">
+        <Parent guid="guidAIAgentPackageCmdSet" id="AIAgentMenuGroup" />
+        <Icon guid="guidImages" id="bmpPic3" />
+        <Strings>
+          <ButtonText>Refactoriser avec IA</ButtonText>
+          <MenuText>🔄 Refactoriser avec IA</MenuText>
+          <ToolTipText>Refactorise le code sélectionné avec l'IA</ToolTipText>
+        </Strings>
+      </Button>
+
+      <!-- Commande pour générer des tests -->
+      <Button guid="guidAIAgentPackageCmdSet" id="GenerateTestsCommandId" priority="0x0103" type="Button">
+        <Parent guid="guidAIAgentPackageCmdSet" id="AIAgentMenuGroup" />
+        <Icon guid="guidImages" id="bmpPic4" />
+        <Strings>
+          <ButtonText>Générer tests avec IA</ButtonText>
+          <MenuText>🧪 Générer tests avec IA</MenuText>
+          <ToolTipText>Génère des tests unitaires avec l'IA</ToolTipText>
+        </Strings>
+      </Button>
+
+      <!-- Commande pour analyser un fichier entier -->
+      <Button guid="guidAIAgentPackageCmdSet" id="AnalyzeFileCommandId" priority="0x0104" type="Button">
+        <Parent guid="guidAIAgentPackageCmdSet" id="AIAgentSolutionGroup" />
+        <Icon guid="guidImages" id="bmpPic5" />
+        <Strings>
+          <ButtonText>Analyser fichier avec IA</ButtonText>
+          <MenuText>📄 Analyser fichier avec IA</MenuText>
+          <ToolTipText>Analyse le fichier entier avec l'IA</ToolTipText>
+        </Strings>
+      </Button>
+    </Buttons>
+
+    <Bitmaps>
+      <Bitmap guid="guidImages" href="Resources\AIAgentCommands.png" usedList="bmpPic1, bmpPic2, bmpPic3, bmpPic4, bmpPic5, bmpPic6"/>
+    </Bitmaps>
+  </Commands>
+
+  <KeyBindings>
+    <!-- Raccourcis clavier -->
+    <KeyBinding guid="guidAIAgentPackageCmdSet" id="ShowToolWindowCommandId" editor="guidVSStd97" key1="A" mod1="Control Alt" />
+    <KeyBinding guid="guidAIAgentPackageCmdSet" id="AnalyzeCodeCommandId" editor="guidVSStd97" key1="D" mod1="Control Alt" />
+    <KeyBinding guid="guidAIAgentPackageCmdSet" id="RefactorCommandId" editor="guidVSStd97" key1="R" mod1="Control Alt" />
+    <KeyBinding guid="guidAIAgentPackageCmdSet" id="GenerateTestsCommandId" editor="guidVSStd97" key1="T" mod1="Control Alt" />
+  </KeyBindings>
+
+  <Symbols>
+    <!-- Package GUID -->
+    <GuidSymbol name="guidAIAgentPackage" value="{12345678-1234-1234-1234-123456789012}" />
+    
+    <!-- Command Set GUID -->
+    <GuidSymbol name="guidAIAgentPackageCmdSet" value="{87654321-4321-4321-4321-210987654321}">
+      <!-- Groups -->
+      <IDSymbol name="AIAgentMenuGroup" value="0x1020" />
+      <IDSymbol name="AIAgentToolsGroup" value="0x1021" />
+      <IDSymbol name="AIAgentSolutionGroup" value="0x1022" />
+      
+      <!-- Commands -->
+      <IDSymbol name="ShowToolWindowCommandId" value="0x0100" />
+      <IDSymbol name="AnalyzeCodeCommandId" value="0x0101" />
+      <IDSymbol name="RefactorCommandId" value="0x0102" />
+      <IDSymbol name="GenerateTestsCommandId" value="0x0103" />
+      <IDSymbol name="AnalyzeFileCommandId" value="0x0104" />
+    </GuidSymbol>
+    
+    <!-- Images GUID -->
+    <GuidSymbol name="guidImages" value="{10203040-5060-7080-9010-203040506070}">
+      <IDSymbol name="bmpPic1" value="1" />
+      <IDSymbol name="bmpPic2" value="2" />
+      <IDSymbol name="bmpPic3" value="3" />
+      <IDSymbol name="bmpPic4" value="4" />
+      <IDSymbol name="bmpPic5" value="5" />
+      <IDSymbol name="bmpPic6" value="6" />
+    </GuidSymbol>
+  </Symbols>
+</CommandTable>
