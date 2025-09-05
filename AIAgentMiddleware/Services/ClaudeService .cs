@@ -1,6 +1,7 @@
 using System.Text;
 using System.Text.Json;
 using AIAgentMiddleware.Models;
+using AIAgentMiddleware.Utils;
 
 namespace AIAgentMiddleware.Services;
 
@@ -16,9 +17,9 @@ public class ClaudeService : IClaudeService
     private readonly IConfiguration _configuration;
     private readonly ILogger<ClaudeService> _logger;
 
-    public ClaudeService(HttpClient httpClient, IConfiguration configuration, ILogger<ClaudeService> logger)
+    public ClaudeService(HttpClient httpHttpClient, IConfiguration configuration, ILogger<ClaudeService> logger)
     {
-        _httpClient = httpClient;
+        _httpClient = httpHttpClient;
         _configuration = configuration;
         _logger = logger;
 
@@ -51,16 +52,23 @@ public class ClaudeService : IClaudeService
 
         try
         {
-            var json = JsonSerializer.Serialize(request, new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower });
+            var json = JsonSerializer.Serialize(request, new JsonSerializerOptions { PropertyNamingPolicy = new SnakeCaseNamingPolicy() });
             var content = new StringContent(json, Encoding.UTF8, "application/json");
 
             var response = await _httpClient.PostAsync("v1/messages", content);
             response.EnsureSuccessStatusCode();
 
             var responseJson = await response.Content.ReadAsStringAsync();
-            var claudeResponse = JsonSerializer.Deserialize<ClaudeResponse>(responseJson, new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower });
+            var claudeResponse = JsonSerializer.Deserialize<ClaudeResponse>(responseJson, new JsonSerializerOptions { PropertyNamingPolicy = new SnakeCaseNamingPolicy() });
 
-            return claudeResponse?.Content?.FirstOrDefault()?.Text ?? "Aucune réponse de Claude";
+            if (claudeResponse == null)
+                throw new Exception("Réponse Claude API nulle");
+            if (claudeResponse.Content == null || claudeResponse.Content.Count == 0)
+                throw new Exception("Aucun contenu retourné par Claude API");
+            if (string.IsNullOrWhiteSpace(claudeResponse.Content[0].Text))
+                throw new Exception("Texte de réponse vide de Claude API");
+
+            return claudeResponse.Content[0].Text;
         }
         catch (Exception ex)
         {
@@ -92,16 +100,23 @@ public class ClaudeService : IClaudeService
 
         try
         {
-            var json = JsonSerializer.Serialize(request, new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower });
+            var json = JsonSerializer.Serialize(request, new JsonSerializerOptions { PropertyNamingPolicy = new SnakeCaseNamingPolicy() });
             var content = new StringContent(json, Encoding.UTF8, "application/json");
 
             var response = await _httpClient.PostAsync("v1/messages", content);
             response.EnsureSuccessStatusCode();
 
             var responseJson = await response.Content.ReadAsStringAsync();
-            var claudeResponse = JsonSerializer.Deserialize<ClaudeResponse>(responseJson, new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower });
+            var claudeResponse = JsonSerializer.Deserialize<ClaudeResponse>(responseJson, new JsonSerializerOptions { PropertyNamingPolicy = new SnakeCaseNamingPolicy() });
 
-            return claudeResponse?.Content?.FirstOrDefault()?.Text ?? "Aucune suggestion générée";
+            if (claudeResponse == null)
+                throw new Exception("Réponse Claude API nulle");
+            if (claudeResponse.Content == null || claudeResponse.Content.Count == 0)
+                throw new Exception("Aucun contenu retourné par Claude API");
+            if (string.IsNullOrWhiteSpace(claudeResponse.Content[0].Text))
+                throw new Exception("Texte de réponse vide de Claude API");
+
+            return claudeResponse.Content[0].Text;
         }
         catch (Exception ex)
         {
