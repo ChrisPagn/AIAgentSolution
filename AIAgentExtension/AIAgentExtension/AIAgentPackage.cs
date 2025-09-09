@@ -4,6 +4,7 @@ using System;
 using System.Runtime.InteropServices;
 using System.Threading;
 using Task = System.Threading.Tasks.Task;
+using System.ComponentModel;
 
 namespace AIAgentExtension
 {
@@ -47,6 +48,23 @@ namespace AIAgentExtension
             Microsoft.VisualStudio.ErrorHandler.ThrowOnFailure(windowFrame.Show());
             return windowFrame;
         }
+
+        public static T GetDialogPage<T>() where T : DialogPage
+        {
+            var package = GetGlobalService(typeof(SVsShell)) as IVsShell;
+            if (package != null)
+            {
+                // Rechercher le package chargé
+                var packageGuid = new Guid(PackageGuidString);
+                package.IsPackageLoaded(ref packageGuid, out IVsPackage vsPackage);
+
+                if (vsPackage is AIAgentPackage aiPackage)
+                {
+                    return (T)aiPackage.GetDialogPage(typeof(T));
+                }
+            }
+            return null;
+        }
     }
 
     // Page d'options pour configurer les API keys
@@ -65,6 +83,6 @@ namespace AIAgentExtension
         [Category("Middleware")]
         [DisplayName("Agent API URL")]
         [Description("URL de votre middleware agent")]
-        public string AgentApiUrl { get; set; } = "http://localhost:5210"; // Corrigé le port
+        public string AgentApiUrl { get; set; } = "http://localhost:5210";
     }
 }

@@ -4,6 +4,8 @@ using System;
 using System.ComponentModel.Design;
 using Task = System.Threading.Tasks.Task;
 using EnvDTE;
+using System.IO;
+using System.Text;
 
 namespace AIAgentExtension
 {
@@ -26,8 +28,6 @@ namespace AIAgentExtension
         }
 
         public static ShowToolWindowCommand Instance { get; private set; }
-
-        private Microsoft.VisualStudio.Shell.IAsyncServiceProvider ServiceProvider => this.package;
 
         public static async Task InitializeAsync(AsyncPackage package)
         {
@@ -82,8 +82,8 @@ namespace AIAgentExtension
                 var dte = await ServiceProvider.GetGlobalServiceAsync(typeof(DTE)) as DTE;
                 if (dte?.ActiveDocument?.Selection is TextSelection selection && !string.IsNullOrEmpty(selection.Text))
                 {
-                    var package = this.package as AIAgentPackage;
-                    await package?.ShowToolWindowAsync();
+                    // Analyser le code sélectionné
+                    await AnalyzeSelectedCodeAsync(selection.Text, dte);
                 }
                 else
                 {
@@ -108,16 +108,20 @@ namespace AIAgentExtension
             }
         }
 
+        private async Task AnalyzeSelectedCodeAsync(string selectedCode, DTE dte)
+        {
+            // Ouvrir la fenêtre de chat et envoyer automatiquement la demande d'analyse
+            var package = this.package as AIAgentPackage;
+            await package?.ShowToolWindowAsync();
+
+            // Optionnel : envoyer automatiquement l'analyse
+            // TODO: Ajouter la logique pour envoyer automatiquement à l'agent
+        }
+
         private Microsoft.VisualStudio.Shell.IAsyncServiceProvider ServiceProvider => this.package;
     }
 
     // Commande pour refactoriser
-    /// <summary>
-    /// Represents a command that triggers a refactoring operation within the Visual Studio environment.
-    /// </summary>
-    /// <remarks>This command is registered with a specific command ID and GUID, and it integrates with the
-    /// Visual Studio command system. It is designed to display a tool window when executed. The command is initialized
-    /// asynchronously and must be accessed through the <see cref="Instance"/> property after initialization.</remarks>
     internal sealed class RefactorCommand
     {
         public const int CommandId = 0x0102;
@@ -148,9 +152,43 @@ namespace AIAgentExtension
         {
             await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
 
+            try
+            {
+                var dte = await ServiceProvider.GetGlobalServiceAsync(typeof(DTE)) as DTE;
+                if (dte?.ActiveDocument?.Selection is TextSelection selection && !string.IsNullOrEmpty(selection.Text))
+                {
+                    await RefactorSelectedCodeAsync(selection.Text, dte);
+                }
+                else
+                {
+                    VsShellUtilities.ShowMessageBox(
+                        this.package,
+                        "Veuillez sélectionner du code à refactoriser.",
+                        "AI Agent",
+                        OLEMSGICON.OLEMSGICON_INFO,
+                        OLEMSGBUTTON.OLEMSGBUTTON_OK,
+                        OLEMSGDEFBUTTON.OLEMSGDEFBUTTON_FIRST);
+                }
+            }
+            catch (Exception ex)
+            {
+                VsShellUtilities.ShowMessageBox(
+                    this.package,
+                    $"Erreur lors du refactoring : {ex.Message}",
+                    "AI Agent Error",
+                    OLEMSGICON.OLEMSGICON_CRITICAL,
+                    OLEMSGBUTTON.OLEMSGBUTTON_OK,
+                    OLEMSGDEFBUTTON.OLEMSGDEFBUTTON_FIRST);
+            }
+        }
+
+        private async Task RefactorSelectedCodeAsync(string selectedCode, DTE dte)
+        {
             var package = this.package as AIAgentPackage;
             await package?.ShowToolWindowAsync();
         }
+
+        private Microsoft.VisualStudio.Shell.IAsyncServiceProvider ServiceProvider => this.package;
     }
 
     // Commande pour générer des tests
@@ -184,8 +222,42 @@ namespace AIAgentExtension
         {
             await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
 
+            try
+            {
+                var dte = await ServiceProvider.GetGlobalServiceAsync(typeof(DTE)) as DTE;
+                if (dte?.ActiveDocument?.Selection is TextSelection selection && !string.IsNullOrEmpty(selection.Text))
+                {
+                    await GenerateTestsForCodeAsync(selection.Text, dte);
+                }
+                else
+                {
+                    VsShellUtilities.ShowMessageBox(
+                        this.package,
+                        "Veuillez sélectionner du code pour générer des tests.",
+                        "AI Agent",
+                        OLEMSGICON.OLEMSGICON_INFO,
+                        OLEMSGBUTTON.OLEMSGBUTTON_OK,
+                        OLEMSGDEFBUTTON.OLEMSGDEFBUTTON_FIRST);
+                }
+            }
+            catch (Exception ex)
+            {
+                VsShellUtilities.ShowMessageBox(
+                    this.package,
+                    $"Erreur lors de la génération des tests : {ex.Message}",
+                    "AI Agent Error",
+                    OLEMSGICON.OLEMSGICON_CRITICAL,
+                    OLEMSGBUTTON.OLEMSGBUTTON_OK,
+                    OLEMSGDEFBUTTON.OLEMSGDEFBUTTON_FIRST);
+            }
+        }
+
+        private async Task GenerateTestsForCodeAsync(string selectedCode, DTE dte)
+        {
             var package = this.package as AIAgentPackage;
             await package?.ShowToolWindowAsync();
         }
+
+        private Microsoft.VisualStudio.Shell.IAsyncServiceProvider ServiceProvider => this.package;
     }
 }
